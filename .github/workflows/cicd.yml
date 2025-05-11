@@ -10,9 +10,10 @@ jobs:
   dockerbuild:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: Build The Docker Image
+    - name: Build the Docker image (local only)
       run: docker build . --file Dockerfile --tag workflow-test:$(date +%s)
 
   build-and-test:
@@ -52,13 +53,14 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image (multi-platform)
       id: docker_build
       uses: docker/build-push-action@v4
       with:
         context: .
         file: ./Dockerfile
         push: true
+        platforms: linux/amd64,linux/arm64
         tags: ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
 
     - name: Image digest
